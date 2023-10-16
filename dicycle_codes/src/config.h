@@ -38,7 +38,7 @@
 #define BODY_MAX_PITCH          30.0f
 #define BODY_MAX_ROLL           30.0f
 
-#define BODY_MAX_PITCH_OUT      100
+#define BODY_MAX_PITCH_OUT      500
 #define BODY_MAX_ROLL_OUT       100
 #define BODY_MAX_MOVE_MULT      3.0f
 

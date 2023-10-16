@@ -145,11 +145,6 @@ void GyroDev::setup(int16_t *offsets) {
     }
 
     if (_devStatus == 0) {
-        // Calibration Time: generate offsets and calibrate our MPU6050
-        // mpu.CalibrateAccel(6);
-        // mpu.CalibrateGyro(6);
-        // mpu.PrintActiveOffsets();
-
         // turn on the DMP, now that it's ready
         LOG("Enabling DMP...\n");
         mpu.setDMPEnabled(true);
@@ -176,34 +171,18 @@ void GyroDev::setup(int16_t *offsets) {
 * LOOP
 *****************************************************************************************
 */
-uint8_t GyroDev::loop(void) {
+ypr_t *GyroDev::get(void) {
     uint8_t     ret = 0;
     float       buf[3];
     VectorInt16 result;
     VectorInt16 raw;
+    ypr_t       *out = NULL;
 
     if (!_isEnable || !_isDmpReady) {
-        return ret;
+        return NULL;
     }
 
-    // _fifoCount = mpu.getFIFOCount();
-    // if (_fifoCount < _packetSize) {
-    //     return ret;
-    // }
-
     if (mpu.dmpGetCurrentFIFOPacket(_fifoBuffer)) {
-
-    // _mpuIntStatus   = mpu.getIntStatus();
-    // if ((_mpuIntStatus & _BV(MPU6050_IMU::MPU6050_INTERRUPT_FIFO_OFLOW_BIT)) || _fifoCount >= 1024) {
-    //     mpu.resetFIFO();
-    //     LOG("FIFO overflow!\n");
-    // } else if (_mpuIntStatus & _BV(MPU6050_IMU::MPU6050_INTERRUPT_DMP_INT_BIT)) {
-    //     while (_fifoCount >= _packetSize) {
-    //         mpu.getFIFOBytes(_fifoBuffer, _packetSize);
-    //         mpu.dmpGetCurrentFIFOPacket()
-    //         _fifoCount -= _packetSize;
-    //     }
-
         // Euler angles in degrees
         mpu.dmpGetQuaternion(&q, _fifoBuffer);
         mpu.dmpGetGravity(&gravity, &q);
@@ -226,9 +205,7 @@ uint8_t GyroDev::loop(void) {
         _ypr.yaw   = degrees(buf[0]);
         _ypr.pitch = degrees(buf[1]);
         _ypr.roll  = degrees(buf[2]);
-
-        ret = 1;
+        out = &_ypr;
     }
-    return ret;
+    return out;
 }
-

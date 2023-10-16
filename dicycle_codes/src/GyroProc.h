@@ -57,6 +57,7 @@ private:
 
     bool            _isStand;
     ypr_t           _oldYpr;
+    unsigned long   _oldTS;
     float           _motor_speed[2];
     float           _estSpeed;
     float           _output;
@@ -68,6 +69,8 @@ private:
     float           _p, _i, _d, _m;
     int             _iSel;
     int16_t         _offsets[6];
+
+    int16_t         _max_tgt_angle;
 };
 
 #endif

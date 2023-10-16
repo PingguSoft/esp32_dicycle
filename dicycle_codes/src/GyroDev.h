@@ -48,7 +48,7 @@ class GyroDev
 {
 public:
     void    setup(int16_t *offsets);
-    uint8_t loop(void);
+    ypr_t  *get(void);
     bool    calibrate(int16_t *offsets);
     bool    isEnabled(void) { return _isEnable;  }
     euler_t getEuler(void)  { return _euler; }
@@ -60,7 +60,7 @@ private:
     void    sleep(void);
     int8_t  cut(int val);
     float   delta(float val);
-    
+
     //
     // MPU control/status vars
     bool          _isDmpReady   = false;      // set true if DMP init was successful

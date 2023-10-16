@@ -28,8 +28,8 @@ static ControlStick         _joy;
 static CommInterface*       _pComm = NULL;
 static CommandHandler       _cmdHandler;
 
-// static OTA                  _ota(SERVER_NAME);
-// static FSBrowser            _fsbrowser(SERVER_NAME);
+static OTA                  _ota(SERVER_NAME);
+static FSBrowser            _fsbrowser(SERVER_NAME);
 static Timer<>              _timer = timer_create_default();
 
 static bool                 _isCal = false;
@@ -51,22 +51,17 @@ int loopOTA(unsigned long ts) {
 
     switch (state) {
         case 0:
-#if CONFIG_ENABLE_BTPADS
+#if (CONFIG_CONTROL == CONFIG_CONTROL_BTPADS)
             _joy.stop();
 #endif
-
-#if 0
             _ota.setup((char*)WIFI_SSID, (char*)WIFI_PASSWORD);
             _cmdHandler.getStatusLed()->set(StatusLed::ALL_POS, StatusLed::COLOR_RED, 1000);
-#endif
             state = 1;
             return -1;
 
         case 1:
-#if 0
             _ota.loop();
             _cmdHandler.getStatusLed()->loop(ts);
-#endif
             return -1;
     }
     return 0;
@@ -79,7 +74,6 @@ int loopFS(unsigned long ts, bool isClose = false) {
         state = 2;
     }
 
-#if 0
     switch (state) {
         case 0:
             state = 1;
@@ -98,7 +92,6 @@ int loopFS(unsigned long ts, bool isClose = false) {
             return -1;
 
     }
-#endif
     return 0;
 }
 
@@ -240,7 +233,7 @@ static int handleSerialCommand(unsigned long ts, int key) {
 
             case 3:
                 loopOTA(ts);
-        return -100;
+                return -100;
         }
     }
 
@@ -460,6 +453,37 @@ static bool batteryCheck(void* param) {
     return true;
 }
 
+void listDir(fs::FS& fs, const char* dirname, uint8_t levels) {
+    File root = fs.open(dirname);
+    if (!root) {
+        LOG("Failed to open directory\n");
+        return;
+    }
+    if (!root.isDirectory()) {
+        LOG("Not a directory\n");
+        return;
+    }
+
+    File file = root.openNextFile();
+    while (file) {
+        if (file.isDirectory()) {
+            LOG("[%-30s] %12s", file.name(), " ");
+            time_t t = file.getLastWrite();
+            struct tm* tmstruct = localtime(&t);
+            LOG(" %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct->tm_year) + 1900, (tmstruct->tm_mon) + 1, tmstruct->tm_mday, tmstruct->tm_hour, tmstruct->tm_min, tmstruct->tm_sec);
+            if (levels) {
+                listDir(fs, file.name(), levels - 1);
+            }
+        } else {
+            LOG(" %-30s  %12lu", file.name(), file.size());
+            time_t t = file.getLastWrite();
+            struct tm* tmstruct = localtime(&t);
+            LOG(" %d-%02d-%02d %02d:%02d:%02d\n", (tmstruct->tm_year) + 1900, (tmstruct->tm_mon) + 1, tmstruct->tm_mday, tmstruct->tm_hour, tmstruct->tm_min, tmstruct->tm_sec);
+        }
+        file = root.openNextFile();
+    }
+}
+
 void setup() {
     //setCpuFrequencyMhz(80);
     Serial.begin(115200);
@@ -467,7 +491,6 @@ void setup() {
     esp_log_level_set("*", ESP_LOG_WARN);
 
     LOG("setup start !!! : heap:%d, psram:%d\n", ESP.getFreeHeap(), ESP.getPsramSize());
-
     pinMode(PIN_PWR_LED, OUTPUT);
     digitalWrite(PIN_PWR_LED, HIGH);
 
@@ -475,10 +498,13 @@ void setup() {
     // pinMode(PIN_SDA0, INPUT_PULLUP);
     Wire.begin(PIN_SDA0, PIN_SCL0, 400000);
 
-
     if (!SPIFFS.begin(true)) {
         LOG("SPIFFS Mount Failed\n");
     }
+    LOG("\n\n--- SPIFFS %ld / %ld ---\n", SPIFFS.usedBytes(), SPIFFS.totalBytes());
+    listDir(SPIFFS, "/", 0);
+    LOG("----------------------\n\n");
+
     // _timer.every(5000, batteryCheck);
 
     if (!_isCal) {
@@ -532,7 +558,8 @@ void loop() {
 //         }
 //         if (!_joy.isConnected())
 // #endif
-//             _pComm->loop();
+//                if (_pComm)
+//                    _pComm->loop();
     }
 
     _timer.tick();
