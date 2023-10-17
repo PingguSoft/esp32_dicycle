@@ -59,15 +59,15 @@
 #define PIN_SCL0                22
 #define PIN_SDA0                21
 
-#define PIN_L_PHASE_A           15
-#define PIN_L_PHASE_B           2
-#define PIN_L_PWM               4
+#define PIN_L_PHASE_A           2
+#define PIN_L_PHASE_B           15
+#define PIN_L_PWM               13
 
-#define PIN_R_PHASE_A           16
-#define PIN_R_PHASE_B           17
-#define PIN_R_PWM               5
+#define PIN_R_PHASE_A           4
+#define PIN_R_PHASE_B           16
+#define PIN_R_PWM               12
 
-#define PIN_LED_STRIP           12
+#define PIN_LED_STRIP           17
 #define PIN_PWR_LED             0
 #define PIN_PWR_ADC             A0
 

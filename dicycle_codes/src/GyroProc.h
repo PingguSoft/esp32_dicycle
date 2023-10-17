@@ -58,10 +58,11 @@ private:
     bool            _isStand;
     ypr_t           _oldYpr;
     unsigned long   _oldTS;
-    float           _motor_speed[2];
+    int16_t         _motor_speed[2];
     float           _estSpeed;
     float           _output;
     float           _eff;
+    int16_t         _act_speed;
 
     Rotator         _rotTgt;
 

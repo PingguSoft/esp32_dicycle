@@ -69,8 +69,8 @@ void initPCNT(pcnt_unit_t unit, int gpio_a, int gpio_b = PCNT_PIN_NOT_USED,
     pcnt_config_t pcnt_config = {
         .pulse_gpio_num = gpio_a,           // set gpio for pulse input gpio
         .ctrl_gpio_num = gpio_b,            // set gpio for control, not used
-        .lctrl_mode = PCNT_MODE_KEEP,       // Rising A on LOW B  = CW Step
-        .hctrl_mode = PCNT_MODE_REVERSE,    // Rising A on HIGH B = CCW Step
+        .lctrl_mode = PCNT_MODE_REVERSE,    // Rising A on LOW B  = CW Step
+        .hctrl_mode = PCNT_MODE_KEEP,       // Rising A on HIGH B = CCW Step
         .pos_mode = PCNT_COUNT_INC,         // increment the counter on positive edge
         .neg_mode = PCNT_COUNT_DIS,         // do nothing on falling edge
         .counter_h_lim = h_lim,

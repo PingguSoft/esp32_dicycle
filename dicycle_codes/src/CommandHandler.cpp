@@ -37,6 +37,10 @@ CommandHandler::CommandHandler(CommInterface* comm) :
     _isBalance   = false;
     memset(_isConnected, 0, sizeof(_isConnected));
 
+    int16_t *ptr = &_rc.roll;
+    for(int i = 0; i < sizeof(_rc) / sizeof(int16_t); i++)
+        *ptr++ = 1500;
+
     _vecMove.set(0, 0, 0);
     _rotMove.set(0, 0, 0);
     _legHeight   = 0;
@@ -79,7 +83,7 @@ void CommandHandler::loop() {
             //_vecMove.z     = (mt * fCurGain) + (_vecMove.z * fPrevGain);
 
             float mr = Utils::mapf(_rc.roll,     1000, 2000, -40,   40);
-            float mp = Utils::mapf(_rc.pitch,    1000, 2000, 100, -100);        // invert pitch
+            float mp = Utils::mapf(_rc.pitch,    1000, 2000, 100, -100);            // invert pitch
 
             _rotMove.yaw   = 0;
             _rotMove.pitch = (mp * fCurGain) + (_rotMove.pitch * fPrevGain);

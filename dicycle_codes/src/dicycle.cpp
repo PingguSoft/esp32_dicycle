@@ -54,8 +54,10 @@ void Dicycle::moveLeg(float x, float z) {
 }
 
 void Dicycle::update(unsigned long ts, bool isWalk, Vector vMov, Rotator rRot) {
-    _lLastChcked = ts;
     int speed[2];
 
-    _gyroProc.process(ts, rRot, speed);
+    if (ts - _lLastChcked > 20) {
+        _gyroProc.process(ts, rRot, speed);
+        _lLastChcked = ts;
+    }
 }
